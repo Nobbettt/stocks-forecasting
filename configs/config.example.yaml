@@ -1,0 +1,85 @@
+project:
+  name: stocks-forecasting
+  mode: evaluation
+  random_seed: 42
+
+database:
+  host: localhost
+  port: 5432
+  database: stocks
+  user: postgres
+  # Recommended: set POSTGRES_PASSWORD in your environment and keep secrets out of this file.
+  password: ${POSTGRES_PASSWORD}
+
+universe:
+  source: active_db
+  # Optional: limit symbols for local smoke-runs
+  # limit_symbols: 200
+
+data:
+  price_type: 1d
+  min_history_years: 2
+
+features:
+  target:
+    kind: log_return
+    price_field: close
+
+  technical_indicators:
+    sma_windows: [20, 50, 200]
+    ema_windows: [12, 26]
+    macd:
+      fast: 12
+      slow: 26
+      signal: 9
+    rsi_period: 14
+    bollinger:
+      window: 20
+      num_standard_deviations: 2.0
+    atr_period: 14
+    include_obv: true
+    volume_sma_window: 20
+
+  known_future:
+    include_day_of_week: true
+    include_day_of_month: true
+    include_week_of_year: true
+    include_month: true
+    include_quarter: true
+    include_is_month_end: true
+    include_is_quarter_end: true
+    include_holidays: true
+
+  calendar:
+    provider: python_exchange_calendars
+    unknown_exchange_policy: fallback_naive_weekdays
+
+split:
+  evaluation:
+    train_months: 18
+    val_months: 3
+    test_months: 3
+    gap_days: 0
+    symbol_train_ratio: 0.70
+    symbol_val_ratio: 0.15
+    symbol_test_ratio: 0.15
+    # Optional: force specific symbols into the test split (never used for training).
+    # These symbols are excluded when determining the global `as_of_date` cutoff.
+    # test_only_symbols: [SPY, QQQ]
+    stratify_by: [sector, industry, market_cap_bucket]
+
+model:
+  type: tft
+  input_chunk_length: 252
+  horizon_days: 30
+  quantiles: [0.1, 0.5, 0.9]
+
+training:
+  max_epochs: 50
+  batch_size: 64
+  learning_rate: 0.0005
+  early_stopping_patience: 5
+
+artifacts:
+  root_dir: artifacts
+  bundle_name: tft_log_returns

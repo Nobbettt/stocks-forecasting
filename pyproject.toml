@@ -1,0 +1,33 @@
+[project]
+name = "stocks-forecasting"
+version = "0.1.0"
+description = "Temporal Fusion Transformer (TFT) forecasting system for the Stocks platform."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "pydantic>=2.6",
+  "pydantic-settings>=2.2",
+  "exchange-calendars>=4.6",
+  "pandas>=2.2",
+  "psycopg[binary]>=3.2",
+  "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "ruff>=0.7.0",
+]
+train = [
+  "u8darts[torch]>=0.31.0",
+]
+
+[build-system]
+requires = ["hatchling>=1.24.2"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/stocks_forecasting"]
+
+[project.scripts]
+stocks-forecasting = "stocks_forecasting.cli:main"

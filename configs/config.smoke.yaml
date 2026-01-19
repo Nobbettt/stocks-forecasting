@@ -1,0 +1,84 @@
+project:
+  name: stocks-forecasting
+  mode: evaluation
+  random_seed: 42
+
+database:
+  host: localhost
+  port: 5432
+  database: stocks
+  user: postgres
+  password: ${POSTGRES_PASSWORD}
+  # The TimescaleDB docker image in the main `stocks` harness does not support SSL.
+  sslmode: disable
+
+universe:
+  source: active_db
+  # Keep small for fast local smoke tests
+  limit_symbols: 50
+
+data:
+  price_type: 1d
+  min_history_years: 2
+
+features:
+  target:
+    kind: log_return
+    price_field: close
+
+  technical_indicators:
+    sma_windows: [20, 50, 200]
+    ema_windows: [12, 26]
+    macd:
+      fast: 12
+      slow: 26
+      signal: 9
+    rsi_period: 14
+    bollinger:
+      window: 20
+      num_standard_deviations: 2.0
+    atr_period: 14
+    include_obv: true
+    volume_sma_window: 20
+
+  known_future:
+    include_day_of_week: true
+    include_day_of_month: true
+    include_week_of_year: true
+    include_month: true
+    include_quarter: true
+    include_is_month_end: true
+    include_is_quarter_end: true
+    include_holidays: true
+
+  calendar:
+    provider: python_exchange_calendars
+    unknown_exchange_policy: fallback_naive_weekdays
+
+split:
+  evaluation:
+    train_months: 18
+    val_months: 3
+    test_months: 3
+    gap_days: 0
+    symbol_train_ratio: 0.70
+    symbol_val_ratio: 0.15
+    symbol_test_ratio: 0.15
+    stratify_by: [sector, industry, market_cap_bucket]
+
+model:
+  type: tft
+  input_chunk_length: 60
+  horizon_days: 10
+  quantiles: [0.1, 0.5, 0.9]
+
+training:
+  max_epochs: 1
+  batch_size: 32
+  learning_rate: 0.0005
+  early_stopping_patience: 0
+
+artifacts:
+  root_dir: artifacts
+  bundle_name: tft_log_returns_smoke
+
