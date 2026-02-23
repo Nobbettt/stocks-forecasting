@@ -14,9 +14,13 @@ venv/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+.uv-cache/
+.cache/
+.torch/
+.mplconfig/
+.ipynb_checkpoints/
 
 # Training artifacts
-artifacts/
-lightning_logs/
-*.ckpt
-
+/artifacts/
+/lightning_logs/
+/*.ckpt

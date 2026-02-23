@@ -15,8 +15,12 @@ class UniverseError(ValueError):
 
 def build_training_universe(client: PostgresClient, config: ForecastingConfig) -> pd.DataFrame:
     """Build eligible symbol universe filtered by minimum history requirement."""
-    limit: int | None = config.universe.limit_symbols
-    active_symbols: list[str] = client.fetch_active_symbols(limit=limit)
+    active_symbols: list[str]
+    if config.universe.symbols is not None:
+        active_symbols = list(config.universe.symbols)
+    else:
+        limit: int | None = config.universe.limit_symbols
+        active_symbols = client.fetch_active_symbols(limit=limit)
     if not active_symbols:
         raise UniverseError("No active symbols found in database")
 
@@ -44,4 +48,3 @@ def build_training_universe(client: PostgresClient, config: ForecastingConfig) -
             f"No symbols meet minimum history requirement ({config.data.min_history_years} years)"
         )
     return eligible
-

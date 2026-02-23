@@ -11,7 +11,7 @@ def test_compute_time_split_basic_ordering() -> None:
     end = pd.Timestamp("2024-12-31", tz="UTC")
     split = compute_time_split(end, cfg)
 
-    assert split.train_start < split.train_end <= split.val_start < split.val_end <= split.test_start <= split.test_end
+    assert split.train_start <= split.train_end < split.val_start <= split.val_end < split.test_start <= split.test_end
 
 
 def test_compute_time_split_gap_creates_excluded_window() -> None:
@@ -19,8 +19,8 @@ def test_compute_time_split_gap_creates_excluded_window() -> None:
     end = pd.Timestamp("2024-12-31", tz="UTC")
     split = compute_time_split(end, cfg)
 
-    assert (split.val_start - split.train_end).days == 5
-    assert (split.test_start - split.val_end).days == 5
+    assert (split.val_start - split.train_end - pd.Timedelta(days=1)).days == 5
+    assert (split.test_start - split.val_end - pd.Timedelta(days=1)).days == 5
 
 
 def test_slice_time_window_inclusive_boundaries() -> None:

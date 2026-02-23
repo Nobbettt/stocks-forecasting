@@ -50,6 +50,20 @@ class UniverseConfig(BaseModel):
     symbols: list[str] | None = None
     limit_symbols: int | None = Field(default=None, gt=0)
 
+    @field_validator("symbols")
+    @classmethod
+    def _normalize_symbols(cls, value: list[str] | None) -> list[str] | None:
+        if value is None:
+            return None
+        cleaned: list[str] = []
+        for item in value:
+            symbol = str(item).strip().upper()
+            if not symbol:
+                continue
+            cleaned.append(symbol)
+        out = sorted(set(cleaned))
+        return out or None
+
 
 class DataConfig(BaseModel):
     """Data source settings: price type and minimum history requirements."""

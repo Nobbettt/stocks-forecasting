@@ -32,6 +32,7 @@ def test_compute_known_future_features_basic_fields() -> None:
     config = KnownFutureConfig(include_holidays=False)
     out = compute_known_future_features(times, config)
     assert out["day_of_month"].tolist() == [31, 1]
+    assert out["week_of_year"].tolist() == [5, 14]
     assert out["month"].tolist() == [1, 4]
     assert out["quarter"].tolist() == [1, 2]
     assert out["is_month_end"].tolist() == [1, 0]

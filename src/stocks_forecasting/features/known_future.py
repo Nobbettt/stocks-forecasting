@@ -52,7 +52,9 @@ def compute_known_future_features(
     if config.include_day_of_month:
         df["day_of_month"] = index.day.astype("int16")
     if config.include_week_of_year:
-        df["week_of_year"] = index.isocalendar().week.astype("int16")
+        # `.isocalendar().week` returns a Series indexed by the original timestamps;
+        # convert to a NumPy array to avoid index-alignment introducing NaNs.
+        df["week_of_year"] = index.isocalendar().week.astype("int16").to_numpy()
     if config.include_month:
         df["month"] = index.month.astype("int16")
     if config.include_quarter:

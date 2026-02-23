@@ -5,6 +5,7 @@ description = "Temporal Fusion Transformer (TFT) forecasting system for the Stoc
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+  "numpy>=1.26",
   "pydantic>=2.6",
   "pydantic-settings>=2.2",
   "exchange-calendars>=4.6",

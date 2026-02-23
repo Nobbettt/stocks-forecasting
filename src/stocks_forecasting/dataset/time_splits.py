@@ -45,11 +45,13 @@ def compute_time_split(series_end: pd.Timestamp, config: EvaluationSplitConfig) 
     val_start: pd.Timestamp = test_start - DateOffset(months=config.val_months)
     train_start: pd.Timestamp = val_start - DateOffset(months=config.train_months)
 
-    gap: pd.Timedelta = pd.Timedelta(days=config.gap_days)
+    # Splits are inclusive windows. `gap_days` specifies how many whole days to exclude
+    # between the end of one split and the start of the next.
+    gap: pd.Timedelta = pd.Timedelta(days=int(config.gap_days) + 1)
     train_end: pd.Timestamp = val_start - gap
     val_end: pd.Timestamp = test_start - gap
 
-    if not (train_start < train_end <= val_start < val_end <= test_start <= end):
+    if not (train_start <= train_end < val_start <= val_end < test_start <= end):
         raise TimeSplitError(
             "Invalid time split boundaries (check months/gap_days relative to series_end)"
         )
